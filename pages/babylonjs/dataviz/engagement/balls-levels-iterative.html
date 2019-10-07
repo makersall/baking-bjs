@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <Title>Moving Balls along a Line</Title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     // touch-action="none" for best results from PEP
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+
+
+var statusDisplay = [    {title: 'High',  color: new BABYLON.Color3.Purple()}, 
+                    {title: 'Medium', color: new BABYLON.Color3.Blue()}, 
+                    {title: 'Low', color: new BABYLON.Color3.Teal}
+                    ];
+
+function createAnimation(name, method, numberFrames, timeline)  {
+    var animation = new BABYLON.Animation(name, method, numberFrames, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    var keys = [];
+    for (let i = 0; i < timeline.length; i++) {
+        keys.push(timeline[i]);
+    };
+    animation.setKeys(keys);
+    return animation;
+};
+
+function createBall(name, ballDiameter, x,y,z, material, scene) {
+        var ball = BABYLON.MeshBuilder.CreateSphere(name, {diameter: ballDiameter}, scene);
+        ball.position = new BABYLON.Vector3(x, y, z);
+        ball.material = material;
+        return ball;
+};
+
+
+var statusPath = [];
+
+var numberPeople = 200;
+var numberStatuses = 3;
+
+for (let i = 0; i < numberPeople; i++) {
+    statusPath[i] = [Math.floor(Math.random() * numberStatuses), Math.floor(Math.random() * numberStatuses), 
+                     Math.floor(Math.random() * numberStatuses), Math.floor(Math.random() * numberStatuses)];
+}
+
+
+var createScene = function () {
+    // Set up a basic scene, including a camera and lighting
+    var scene = new BABYLON.Scene(engine);
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene.cameras[0].radius = 60;                   // Move the camera back so it's easier to see everything in the scene
+    scene.clearColor = BABYLON.Color3.White();       // Set the scene's background color
+    
+
+    var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+    myMaterial.diffuseColor =  new BABYLON.Color3.Teal();
+
+    var numberSets = 100;
+    var setCount = 0;
+    var statusHeight = 10;
+
+    // Up next:
+        // 1) Create a list of levels: name, ballColor
+        // For each set, create 1 ball per level, randomly decide for each ball which level it will go to
+
+        // 2) Create a list of percentages: fromLevel, toLevel  
+        // Use the percentages to decide which ball will go where
+
+    var animationX, animationY;
+        
+    var createAnimationSet = function() {
+        // console.log( setCount, numberSets);
+        if(setCount > numberPeople) {
+            // console.log( 'and we are done')
+            return 
+        }
+        setCount = setCount + 1;
+        var status = statusPath[setCount];
+        // console.log(statusDisplay[status[0]-1]);
+        
+        var ball =  createBall('Ball ' + setCount, 1, -30, 0, 0, myMaterial, scene);
+        var animationX = createAnimation("movingball", "position.x", 30, [ {frame: 0, value: -30}, {frame: 40, value: 20}, {frame: 90, value: 40}] );
+        var animationY = createAnimation("movingBallY", "position.y", 30, [
+            {frame: 0, value: status[0] * statusHeight}, {frame: 10, value: status[1] * statusHeight}, 
+            {frame: 20, value: status[2] * statusHeight}, {frame: 30, value: status[3] * statusHeight} ] ); 
+
+        // if (Math.random() > 0.5) {
+        //     animationY = createAnimation("movingballY", "position.y", 30, [ {frame: 0, value: 10}, {frame: 15, value: 10}, {frame: 30, value: 0} ] );
+        // } else {
+        //     animationY = createAnimation("movingballY", "position.y", 30, [ {frame: 0, value: 0}, {frame: 15, value: 0}, {frame: 30, value: 10} ] );
+        //     animationX = createAnimation("movingball", "position.x", 30, [ {frame: 0, value: -30}, {frame: 40, value: 20}, {frame: 90, value: 40}] );
+        // };
+        
+        var event = new BABYLON.AnimationEvent(2, createAnimationSet, true);
+        animationX.addEvent(event);
+
+// NOTE: set an action at the end:  add an event for the last frame (or second to last frame?) that executes a movewithCollisions
+// Or better yet, create a keyframe at the end that executes a movewithCollisions
+//
+//         var speedCharacter = 8;
+// var gravity = 0.15;
+// var character = Your mesh;
+
+// character.ellipsoid = new BABYLON.Vector3(0.5, 1.0, 0.5);
+// character.ellipsoidOffset = new BABYLON.Vector3(0, 1.0, 0);
+
+// var forwards = new BABYLON.Vector3(parseFloat(Math.sin(character.rotation.y)) / speedCharacter, gravity, parseFloat(Math.cos(character.rotation.y)) / speedCharacter);
+// forwards.negate();
+// character.moveWithCollisions(forwards);
+// // or
+// var backwards = new BABYLON.Vector3(parseFloat(Math.sin(character.rotation.y)) / speedCharacter, -gravity, parseFloat(Math.cos(character.rotation.y)) / speedCharacter);
+// character.moveWithCollisions(backwards);
+
+
+
+
+        scene.beginDirectAnimation(ball, [animationX, animationY], 0, 100, true);
+    }
+// console.log( ': create animation set')
+    createAnimationSet();
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

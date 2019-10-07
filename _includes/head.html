@@ -1,0 +1,31 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Twitter cards -->
+<!-- <meta name="twitter:site"    content="@{{ site.twitter_username }}"> -->
+<!-- <meta name="twitter:creator" content="@{{ page.author }}"> -->
+<meta name="twitter:title"   content="{{ page.title }}">
+
+{% if page.summary %}
+<meta name="twitter:description" content="{{ page.summary }}">
+{% else %}
+<meta name="twitter:description" content="Put it a description of the website">
+{% endif %}
+
+<meta name="twitter:card"  content="summary_large_image">
+
+{% if page.image %}
+<meta name="twitter:image" content="{{ site.url }}{{'/assets/images/' | append:  page.image | relative_url }}">
+{% else %}
+<meta name="twitter:image" content="{{ site.url }}{{ "assets/images/makers-all-banner.png" | relative_url }}">
+{% endif %}
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
+  <link rel="stylesheet" href="{{ "/assets/css/matoolkit.css" | relative_url }}">
+  {%- if page.title -%}
+  <title>{{page.title | escape }}</title>
+  {%- endif -%}
+
+</head>

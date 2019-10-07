@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>        <!--- Link to the last version of BabylonJS --->
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>    <!-- Lets mobile devices manipulate the screen -->
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>      <!-- touch-action="none" for best results from PEP -->
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    var scene = new BABYLON.Scene(engine);
+     scene.clearColor = BABYLON.Color3.White();       // Set the scene's background color
+
+    var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 3 * Math.PI / 8, 5, BABYLON.Vector3.Zero(), scene);
+    camera.attachControl(canvas, true);
+	
+	//Light direction is up and left
+	var light = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(-1, 1, 0), scene);
+	light.diffuse = BABYLON.Color3.White();       
+	// light.diffuse = new BABYLON.Color3(1, 0, 0);
+	// light.specular = new BABYLON.Color3(0, 1, 0);
+	// light.groundColor = new BABYLON.Color3(0, 1, 0);
+	
+	var redMat = new BABYLON.StandardMaterial("redMat", scene);
+	redMat.diffuseColor = new BABYLON.Color3(1, 0, 0);
+	
+	var greenMat = new BABYLON.StandardMaterial("greenMat", scene);
+	greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
+	greenMat.alpha = 0.9;	
+	
+	//Red  
+	var sphere1 = BABYLON.MeshBuilder.CreateSphere("sphere1", {}, scene);
+	sphere1.material = redMat;
+	sphere1.position.x = 1.5;
+	
+	//Green Transparent
+	var sphere2 = BABYLON.MeshBuilder.CreateSphere("sphere2", {}, scene);
+	sphere2.material = greenMat;				
+	    
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

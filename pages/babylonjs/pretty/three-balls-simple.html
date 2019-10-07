@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Balls in a Courtyard</title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     //touch-action="none" for best results from PEP
+
+<script>
+    // Get set up
+    window.addEventListener('DOMContentLoaded', function(){   // Don't think I need this; try taking it away once everything else is working
+        var canvas = document.getElementById('renderCanvas');
+        var engine = new BABYLON.Engine(canvas, true);
+
+
+    function backdropCourtyard(scene, canvas)  {
+    // backdropCourtyard: create a backyard for our work, centered around a pix of a courtyard
+
+        var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 4, Math.PI / 2.5, 200, BABYLON.Vector3.Zero(), scene);
+        camera.attachControl(canvas, true);
+        camera.minZ = 0.1;
+        scene.imageProcessingConfiguration.exposure = 0.6;
+        scene.imageProcessingConfiguration.contrast = 1.6;
+        var backgroundTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("courtyard.dds", scene);
+
+        // Create the Skybox
+        var hdrSkybox = BABYLON.Mesh.CreateBox("hdrSkyBox", 1000.0, scene);
+        var hdrSkyboxMaterial = new BABYLON.PBRMaterial("skyBox", scene);
+        hdrSkyboxMaterial.backFaceCulling = false;
+        hdrSkyboxMaterial.reflectionTexture = backgroundTexture.clone();
+        hdrSkyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        hdrSkyboxMaterial.microSurface = 1.0;
+        hdrSkyboxMaterial.disableLighting = true;
+        hdrSkybox.material = hdrSkyboxMaterial;
+        hdrSkybox.infiniteDistance = true;
+
+        // Return an object with everything you might need to use
+        // NOTE: eventually, I'll switch to using something more elegant; this is just proof of concept
+        return {  backgroundTexture: backgroundTexture };  
+    };
+
+    function simpleGlassSphere(canvas, scene, backdrop)  {
+    // Create a glass sphere, with a bunch of defaults so you don't have to roll your own
+
+        var sphere = BABYLON.Mesh.CreateSphere("sphereGlass", 48, 30.0, scene);
+        var glass = new BABYLON.PBRMaterial("glass", scene);
+        glass.reflectionTexture = backdrop.backgroundTexture;
+        glass.refractionTexture = backdrop.backgroundTexture;
+        glass.linkRefractionWithTransparency = true;
+        glass.indexOfRefraction = 0.52;
+        glass.alpha = 0;
+        glass.microSurface = 1;
+        glass.reflectivityColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        glass.albedoColor = new BABYLON.Color3(0.85, 0.85, 0.85);
+        sphere.material = glass;
+        return sphere;
+    };
+
+    function simpleMetalSphere(canvas, scene, backdrop)  {
+    // Create a metal sphere, with a bunch of defaults so you don't have to roll your own
+
+        var sphere = BABYLON.Mesh.CreateSphere("sphereMetal", 48, 30.0, scene);
+        var metal = new BABYLON.PBRMaterial("metal", scene);
+        metal.reflectionTexture = backdrop.backgroundTexture;
+        metal.microSurface = 0.96;
+        metal.reflectivityColor = new BABYLON.Color3(0.85, 0.85, 0.85);
+        metal.albedoColor = new BABYLON.Color3(0.01, 0.01, 0.01);
+        sphere.material = metal;
+        return sphere;
+    };
+
+    function simplePlasticSphere(canvas, scene, backdrop, color)  {
+    // Create a metal sphere, with a bunch of defaults so you don't have to roll your own
+
+    var sphere = BABYLON.Mesh.CreateSphere("spherePlastic", 48, 30.0, scene);
+	var plastic = new BABYLON.PBRMaterial("plastic", scene);
+    plastic.reflectionTexture = backdrop.backgroundTexture;
+    plastic.microSurface = 0.96;
+	// plastic.albedoColor = new BABYLON.Color3(0.206, 0.94, 1);
+	plastic.albedoColor = color;
+	plastic.reflectivityColor = new BABYLON.Color3(0.003, 0.003, 0.003);
+    sphere.material = plastic;
+    return sphere;
+    };
+
+
+var createScene = function () {
+    var scene = new BABYLON.Scene(engine);
+    var backdrop = backdropCourtyard(scene, canvas);
+
+    var sphereGlass = simpleGlassSphere(canvas, scene, backdrop);
+    sphereGlass.translate(new BABYLON.Vector3(1, 0, 0), -60);
+    // sphereGlass.position = new BABYLON.Vector3(-3, 2, 4);
+    // NOTE: position isn't workking, don't understand why
+    console.log(sphereGlass.position);
+
+    var sphereMetal = simpleMetalSphere(canvas, scene, backdrop);
+    sphereMetal.translate(new BABYLON.Vector3(1, 0, 0), 60);  
+    
+	var spherePlastic = simplePlasticSphere(canvas, scene, backdrop, BABYLON.Color3.Purple());
+    spherePlastic.translate(new BABYLON.Vector3(0, 0, 1), -60);
+
+    // Unlike the spheres, we probably won't want to create a lot of glass tops, so no need to hide in a function
+    var tableTop = BABYLON.MeshBuilder.CreateBox("plane", { width: 65, height: 1, depth: 65 }, scene);
+    var tableMaterial = new BABYLON.PBRMaterial("myGlassTable", scene);
+    tableMaterial.reflectionTexture = backdrop.backgroundTexture;
+    tableTop.material = tableMaterial;
+		
+    return scene;
+};
+
+
+
+
+
+            // call the createScene function
+            var scene = createScene();
+
+            // run the render loop
+            engine.runRenderLoop(function(){
+                scene.render();
+            });
+
+            // the canvas/window resize event handler
+            window.addEventListener('resize', function(){
+                engine.resize();
+            });
+        });
+        // });
+
+    </script>
+</body>
+</html>

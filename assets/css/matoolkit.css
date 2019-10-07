@@ -1,0 +1,77 @@
+/* CSS file for Makers All toolkit */
+
+
+/* Test to make sure this is working */
+  h2 {      
+    padding-top: 18px;
+    /* padding-bottom: 0px; */
+      /* color: red; */
+  }
+
+  h3 {
+    padding-top: 6px;
+  }
+
+
+.main-image {
+  padding-bottom: 20px;
+} 
+
+.main-image-citation {
+  font-style: italic;
+  font-size: 80%;
+}
+
+/* .summary-image {
+    padding-bottom: 20px;
+  } */
+
+.image {
+  grid-area: image;
+}
+
+.content {
+  grid-area: content;
+}
+
+.article-summaries {
+  padding-top: 30px;
+}
+
+.article-summary  {
+  display: grid;
+  grid-template-areas: 
+    "image content";
+  grid-template-columns: minmax(100px, 1fr) 2fr;
+  /* grid-template-columns: 100px 400px; */
+  grid-column-gap: 30px;
+
+  margin-bottom: 30px;
+}
+
+.article-summary header {
+  font-size: 125%;
+}
+
+.article-summary li {
+  padding-left: 0;
+  margin-left: 0;
+}
+
+
+
+.test {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+  grid-gap: 10px;
+  background-color: #fff;
+  color: #444;
+}
+
+.my-box {
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+}

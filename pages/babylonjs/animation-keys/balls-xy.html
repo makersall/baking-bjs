@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <Title>Moving Balls along a Line</Title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     // touch-action="none" for best results from PEP
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    // Set up a basic scene, including a camera and lighting
+    var scene = new BABYLON.Scene(engine);
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene.cameras[0].radius = 60;                   // Move the camera back so it's easier to see everything in the scene
+    scene.clearColor = BABYLON.Color3.White();       // Set the scene's background color
+
+    var numberBalls = 400;
+    var ballCount = 0
+
+    var levelColor = [];
+    levelColor[0] = new BABYLON.StandardMaterial("levelColor[0]", scene);
+    levelColor[0].diffuseColor =  new BABYLON.Color3.Teal();
+    levelColor[1] = new BABYLON.StandardMaterial("levelColor[0]", scene);
+    levelColor[1].diffuseColor =  new BABYLON.Color3.Yellow();
+
+    var statusHeight = 35;
+    var statusSpread = 10;
+
+    function calculateY(status) {
+            return status * statusHeight  +   Math.round(Math.random() * statusSpread)    - 25;
+        };
+    
+    var createBallAnimation = function() {
+        if(ballCount > numberBalls) {
+            return 
+        }
+        var ballLevel = 1;
+        console.log(ballCount, ballLevel);
+        var startY = calculateY(ballLevel);
+        var ball =  BABYLON.MeshBuilder.CreateSphere('Ball ' + ballCount++, {diameter: 0.3}, scene);
+        ball.position = new BABYLON.Vector3(-30, startY, 0); 
+        ball.material = levelColor[0];
+
+        var animationX = new BABYLON.Animation("movingball", "position.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+
+        var dropOut =  (Math.random() > 0.8) ?     Math.round(Math.random() * 12)           : 0;
+
+        if (dropOut < 1) {
+            var keys = [];
+            keys.push({ frame: 0, value: -30});
+            keys.push({ frame: 50, value: 0 });
+            keys.push({ frame: 100, value: 20 + Math.random() * 5 });
+            animationX.setKeys(keys);
+
+            var animationY = new BABYLON.Animation("movingball", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+            var keys = [];
+            keys.push({ frame: 0, value: startY });            
+            keys.push({ frame: 40, value: startY + Math.round(Math.random() * 6) - 3});
+            // keys.push({ frame: 80, value: startY + Math.round(Math.random() * 6) - 3 });
+            keys.push({ frame: 120, value: startY + Math.round(Math.random() * 6) - 3 });
+            animationY.setKeys(keys);
+
+            var event = new BABYLON.AnimationEvent(1, createBallAnimation, true);
+        animationX.addEvent(event);
+
+        scene.beginDirectAnimation(ball, [animationX, animationY], 0, 120, true);
+        } else {
+
+            var keys = [];
+            keys.push({ frame: 0, value: -30});
+            // keys.push({ frame: 80, value: 0 });
+            keys.push({ frame: 100, value: -30 + dropOut * 10});
+            animationX.setKeys(keys);
+
+            var animationY = new BABYLON.Animation("movingball", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+            var keys = [];
+            keys.push({ frame: 0, value: startY });            
+            keys.push({ frame: dropOut * 10 - 5, value: startY });
+            keys.push({ frame: dropOut * 10, value:  -10  });
+            // keys.push({ frame: 80, value:  calculateY(Math.round(Math.random() * 2))  });
+            animationY.setKeys(keys);
+
+            var event = new BABYLON.AnimationEvent(1, createBallAnimation, true);
+        animationX.addEvent(event);
+
+        scene.beginDirectAnimation(ball, [animationX, animationY], 0, 120, true);
+        };
+
+
+    }
+
+    createBallAnimation();
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+title: Baking w BabylonJS
+author: Anders Schneiderman
+email: your-email@domain.com
+description:  Description of this site
+
+# Menu data for sitewide navigation
+navigation_links:
+  - name: About
+    link: 'about/'
+#  - name: Strategy
+#    link: 'strategy/'
+  # - name: Links
+    # link: 'links'
+  - name: Makers All
+    link: 'https://makersall.org/'
+

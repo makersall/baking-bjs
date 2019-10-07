@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Goals in a Row </title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src='../../libraries/simple-datachefs.js'></script>
+
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     // touch-action="none" for best results from PEP
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var goals = [
+        { name: 'Communicate', score: 3},
+        { name: 'Sustain', score: 1},
+        { name: 'Grow', score: 3},
+        { name: 'Transform', score: 2}
+    ];
+
+
+var createScene = function () {
+    // Set up a basic scene, including a camera and lighting
+    var scene = new BABYLON.Scene(engine);
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene.cameras[0].radius = 60;                   // Move the camera back so it's easier to see everything in the scene
+    // scene.clearColor = BABYLON.Color3.Teal();       // Set the scene's background color
+
+    var dome = new BABYLON.PhotoDome(
+        "testdome",
+        // "../assets/GatonaParkWalkway1_Panorama_4Kx2K.jpg",
+        "../../assets/plenar-hall-ortner-marcus2.jpg",
+        // "../assets/bjs-360photo.jpg",
+        {
+            resolution: 32,
+            size: 1000
+        },
+        scene
+    );
+
+
+
+//     var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("bjs-country.dds", scene);
+
+
+//     var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("bjs-room.dds", scene);
+
+// scene.imageProcessingConfiguration.exposure = 0.6;
+// scene.imageProcessingConfiguration.contrast = 1.6;
+
+// // Skybox
+// var hdrSkybox = BABYLON.Mesh.CreateBox("hdrSkyBox", 1000.0, scene);
+// var hdrSkyboxMaterial = new BABYLON.PBRMaterial("skyBox", scene);
+// hdrSkyboxMaterial.backFaceCulling = false;
+// hdrSkyboxMaterial.reflectionTexture = hdrTexture.clone();
+// hdrSkyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+// hdrSkyboxMaterial.microSurface = 1.0;
+// hdrSkyboxMaterial.disableLighting = true;
+// hdrSkybox.material = hdrSkyboxMaterial;
+// hdrSkybox.infiniteDistance = true;
+
+    var goal, sphere, goalMaterial;
+    var goodScoreColor =  new BABYLON.Color3.Purple();
+    var badScoreColor = new BABYLON.Color3.Red();
+
+    // Loop through the goals, creating a sphere for each goal
+    for (goal = 0; goal < goals.length; goal++) {
+        sphere = BABYLON.MeshBuilder.CreateSphere('Goal ' + goal,  {diameter: 10}, scene);
+        sphere.position = new BABYLON.Vector3(-20 + (goal* 16), 0, 0); 
+
+        // If any goal has a score > 1, give it's sphere the good score color; otherwise give it the bad score color
+        var goalMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+        if (goals[goal].score >1) {
+            goalMaterial.diffuseColor = goodScoreColor;
+        } else {
+            goalMaterial.diffuseColor =  badScoreColor;
+        };
+        sphere.material = goalMaterial;
+
+        simpleTextBlock(goals[goal].name, {x: -20 + (goal* 16), y: 9, z: 0},scene);
+
+    };
+
+    return scene;
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>        <!--- Link to the last version of BabylonJS --->
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>    <!-- Lets mobile devices manipulate the screen -->
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>      <!-- touch-action="none" for best results from PEP -->
+
+<script>
+// NOTE: Copied from David Catuhe: https://playground.babylonjs.com/#2FPT1A#56 
+
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+
+    var scene = new BABYLON.Scene(engine);
+  scene.clearColor = new BABYLON.Color3( .1, .1, .15);
+  var camera = new BABYLON.ArcRotateCamera("camera1",  0, 0, 0, new BABYLON.Vector3(0, 0, -0), scene);
+  camera.setPosition(new BABYLON.Vector3(0, 5, -100));
+  camera.attachControl(canvas, true);
+  var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 0, 0), scene);
+  light.intensity = 0.75;
+  light.specular = new BABYLON.Color3(0.95, 0.95, 0.81);
+  var pl = new BABYLON.PointLight("pl", new BABYLON.Vector3(0, 0, 0), scene);
+  pl.diffuse = new BABYLON.Color3(1, 1, 1);
+  pl.specular = new BABYLON.Color3(0.1, 0.1, 0.12);
+  pl.intensity = 0.75;
+     // Skybox
+    var skybox = BABYLON.Mesh.CreateBox("skyBox", 250.0, scene);
+    var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+    skyboxMaterial.backFaceCulling = false;
+
+    // NOTE: get this texture
+    //    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", scene);
+    //  skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.disableLighting = true;
+    skybox.material = skyboxMaterial;
+ 
+      // Fog
+    scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+    //BABYLON.Scene.FOGMODE_NONE;
+    //BABYLON.Scene.FOGMODE_EXP;
+    //BABYLON.Scene.FOGMODE_EXP2;
+    //BABYLON.Scene.FOGMODE_LINEAR;
+
+    scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
+    scene.fogDensity = 0.01;
+
+    //Only if LINEAR
+    scene.fogStart = 50.0;
+    scene.fogEnd = 120.0;
+
+  
+  
+  var nbBuildings = 10000;
+  var fact = 200;   // density
+  var scaleX = 0.0;
+  var scaleY = 0.0;
+  var scaleZ = 0.0;
+  var grey = 0.0;
+  var grey2 = 0.0;
+  var grey3 = 0.0;
+  var uvSize = 0.0;
+  
+  var ground = BABYLON.MeshBuilder.CreatePlane("g", { size: fact }, scene);
+  ground.rotation.x = Math.PI / 2;
+  var groundMat = new BABYLON.StandardMaterial("gm", scene);
+  groundMat.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+  ground.material = groundMat;
+  groundMat.backFaceCulling = false;
+
+  var url = "http://jerome.bousquie.fr/BJS/images/glassbuilding.jpg";
+  var mat = new BABYLON.StandardMaterial("mat1", scene);
+  var texture = new BABYLON.Texture(url, scene);
+  mat.diffuseTexture = texture;
+
+
+ // custom position function
+ var myPositionFunction = function(particle, i, s) {
+      scaleX = Math.random() * 2 + 0.8;
+      scaleY = Math.random()*Math.random()*Math.random() * 6 + 0.8;
+      scaleZ = Math.random() * 2 + 0.8;
+	  uvSize = Math.random() * 0.9;
+      particle.scale.x = scaleX;
+      particle.scale.y = scaleY;
+      particle.scale.z = scaleZ;
+      particle.position.x = (Math.random() - 0.5) * fact;
+      particle.position.y = particle.scale.y / 2 + 0.01;
+      particle.position.z = (Math.random() - 0.5) * fact;
+      //particle.rotation.y = Math.random() * 3.5;
+      grey = 1.0 - Math.random() * 0.5;
+	  grey2 = 1.0 - Math.random() * 0.5;
+	    grey3 = 1.0 - Math.random() * 0.5;
+      particle.color = new BABYLON.Color4(grey + 0.1, grey2 + 0.1, grey3, 1);
+	  particle.uvs.x = 0;//Math.random() * 0.1;
+	  particle.uvs.y = 0;//Math.random() * 0.1;
+	  particle.uvs.z = particle.uvs.x + uvSize;
+	  particle.uvs.w = particle.uvs.y + uvSize;
+  };
+ 
+ 
+  // Particle system creation : Immutable
+  var SPS = new BABYLON.SolidParticleSystem('SPS', scene, {updatable: false});
+  var model = BABYLON.MeshBuilder.CreateBox("m", {}, scene);
+  SPS.addShape(model, nbBuildings, {positionFunction: myPositionFunction});
+  var mesh = SPS.buildMesh();
+  mesh.material = mat;
+  // dispose the model
+  model.dispose();
+
+
+  // SPS mesh animation
+  var k = 0.001;
+  scene.registerBeforeRender(function() {
+    pl.position = camera.position;
+    SPS.mesh.rotation.y += k;
+	ground.rotation.y = SPS.mesh.rotation.y;
+  });
+
+
+
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>        <!--- Link to the last version of BabylonJS --->
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>    <!-- Lets mobile devices manipulate the screen -->
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>      <!-- Scripts for loading object files -->
+    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>   <!-- To use the Inspector when your project is stored and run locally with an internet connection then you need to load the Inspector directly -->
+<style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>      <!-- touch-action="none" for best results from PEP -->
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var delayCreateScene = function () {
+    
+    var scene = new BABYLON.Scene(engine);  
+
+    //NOTE:
+    //Name of the animation I want: idle. Can also try flight_path_1, _2, etc.
+
+    BABYLON.SceneLoader.ImportMesh("", "https://models.babylonjs.com/", "aerobatic_plane.glb", scene, function (meshes) {          
+        scene.createDefaultCameraOrLight(true, true, true);
+        var airplane = meshes[0];
+        // Rotate the plane so we see its side
+        airplane.rotationQuaternion = new BABYLON.Quaternion(0, 0.7575649843840495, 0, -0.6527597524627226);
+        airplane.position.y  = -0.1;
+        var animation = scene.animationGroups[0];   // Grab the first animation, which is for flying straight
+        console.log();
+        scene.animationGroups[0].speedRatio = 0;
+
+
+
+
+        var interval = 100;
+        var time = 0;
+
+        scene.beforeRender = () => {
+            time = time + 1;
+
+            if (time > 600) {
+                return scene;
+            };
+            if (time % interval == 0 )  {
+                console.log(time);
+                animation.speedRatio = Math.random();
+            };
+            // airplane.position.y  = airplane.position.y + (0.01 - (Math.random() * 0.02));
+
+            // airplane.rotation.y += 0.01;
+            // console.log( airplane.position.y);
+        };
+        
+    });
+
+    return scene;
+};
+
+// "Render" the scene so we can see it
+var scene = delayCreateScene();
+scene.createDefaultCamera()
+
+// scene.debugLayer.show();
+
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

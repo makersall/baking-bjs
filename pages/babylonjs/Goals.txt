@@ -1,0 +1,68 @@
+3 spheres
+- Using colors
+- Using a gradient
+- Animation over several years?
+
+Animation of levels
+- Membership email opt out
+- Cost of membership email opt out
+- Social mobility? Or member involvement? (Showing how critical member involvement is in the first year)
+
+Animated characters
+- Running character moving up levels, with commentary (an example of 2D)
+- Pieces of the puzzle
+
+3's super simple examples for learning how to code:
+- create some stuff
+- Using the variable, see you don't have a weird number in the middle of your code; for example, good score versus bad score
+- Storing your data in a list, using a loop
+- Using an if statement
+I don't necessarily have to create the examples, I just need to describe them.
+
+Notes:
+- This first round: focus not on_what_best to communicate but rather what's possible -- what ingredients, what tools. Especially because I'm a developer, not a graphics designer
+- 3 types of 3D data visualization:
+  - To most effectively communicate a story
+  - To get folks fired up -- not uncommon with groups trying to hit goals to do something creative. For example, each year you set goals, so have a graphics designer come up with animated characters you're going to use to represent goals that year
+  - To add sizzle because you need people to pay attention  :-)
+
+
+
+INSPIRATIONS:
+
+And then I could try:
+- Showing only certain parts of a GLFT as a way of displaying progress
+  - start with "https://www.babylonjs.com/Assets/FlightHelmet/glTF/"
+  - call inspector from the code
+  - Try using a sandwich!
+
+- Creating an abstract map
+  - Of a few states where you have offices
+	https://raw.githubusercontent.com/aschneiderman/d3_sandwich/gh-pages/sandwiches/Abstract_Map_1/abstract_state.js
+	https://raw.githubusercontent.com/aschneiderman/d3_sandwich/gh-pages/sandwiches/Abstract_Map_1/abstract_state.html
+  - Of rooms in a building
+
+Miss Melissa - Animating text: Ms. Melissa's Dash-Your-Hopes Board
+http://aschneiderman.github.io/a-taste-of-d3/03-animation/03-30-Text-Ms-Melissa.html
+
+An example of what I could do with skull (have parts light up?)(funny thing on anxieties?)
+https://www.good.is/infographics/vitamin-atlas#open
+
+Animated building of a skyline
+https://www.nationalgeographic.com/new-york-city-skyline-tallest-midtown-manhattan/
+
+Models
+Pizza
+https://sketchfab.com/3d-models/pizza-40d50989fec1460f8838b608d999ccd0
+
+Tool pack
+https://sketchfab.com/3d-models/tools-pack-free-751df614c64f4cbeb4d9f9ea611e5715
+
+Tools 2
+https://sketchfab.com/3d-models/lowpoly-tools-low-resolution-e60923b56a3849bf8f74fa51f6c849f8
+
+Fruits-vegetables
+https://sketchfab.com/3d-models/lowpoly-fruits-dfcd54c92f6b43adb6c72fd7fb9f0c0d
+
+sky house
+https://sketchfab.com/3d-models/stylised-sky-player-home-dioroma-6597e6c9a5184f07a638ac33c08c2ad5

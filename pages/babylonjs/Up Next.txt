@@ -1,0 +1,7 @@
+UP NEXT
+
+
+- Add in HTML colors:
+JavaScript for this:
+https://www.w3schools.com/lib/w3color.js
+

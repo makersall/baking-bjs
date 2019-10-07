@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     // touch-action="none" for best results from PEP
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    // Set up a basic scene, including a camera and lighting
+    var scene = new BABYLON.Scene(engine);
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene.cameras[0].radius = 60;                   // Move the camera back so it's easier to see everything in the scene
+    scene.clearColor = BABYLON.Color3.Teal();       // Set the scene's background color
+
+
+    // Put your code here
+	
+    var createScene = function (engine) {
+    var scene = new BABYLON.Scene(engine);
+    var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, BABYLON.Vector3.Zero(), scene);
+    var light = new BABYLON.HemisphericLight("Omni0", new BABYLON.Vector3(0, 1, 0), scene);
+    var material = new BABYLON.StandardMaterial("kosh", scene);
+    var sphere = BABYLON.Mesh.CreateSphere("Sphere", 32, 3, scene, true);
+
+    camera.setPosition(new BABYLON.Vector3(-10, 10, 0));
+    camera.attachControl(canvas, true);
+
+    sphere.applyDisplacementMap("/textures/amiga.jpg", 0, 1.5);
+
+    // Sphere material
+    material.diffuseTexture = new BABYLON.Texture("/textures/amiga.jpg", scene);
+    sphere.material = material;
+
+    // Skybox
+    var skybox = BABYLON.Mesh.CreateBox("skyBox", 100.0, scene);
+    var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+    skyboxMaterial.backFaceCulling = false;
+    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("/textures/skybox", scene);
+    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.disableLighting = true;
+    skybox.material = skyboxMaterial;
+    skybox.infiniteDistance = true;
+
+    return scene;
+};
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="d3.v4.min.js"></script>         <!-- Load the d3 library -->
+</head>
+<body>
+  <h1>Turning a CSV File of Data into Circles</h1>
+  <h2>SIG Engagement</h2>
+<svg width="960" height="400"></svg>        <!-- SVG graphics will go here  -->
+
+<script type="text/javascript">
+// var myData = [ 5, 10, 15, 20, 25, 5, 20, 10, 20, 5 ];
+d3.csv("sig.csv",function(SIGData) {
+  console.log("Data is:",SIGData[0], "\n\n And now for the main show!");
+
+d3.select("svg").selectAll("circle")
+	.data(SIGData)
+  .enter()
+  .append("circle")
+		.attr("cy", 100)
+		.attr("cx", function(d, i) { return i * 70 + 100; })
+	  .attr("r", function(d) { console.log(d, d["size"]);  m = d; return d["size"] * 3; })
+		.attr("fill", function(d){ return d["engagement"] > 6?  "red" : "pink" } );
+});
+
+</script>
+</body>
+</html>

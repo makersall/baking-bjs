@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>roomScores in a Row </title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     // touch-action="none" for best results from PEP
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    // Set up a basic scene, including a camera and lighting
+    var scene = new BABYLON.Scene(engine);
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene.cameras[0].radius = 60;                   // Move the camera back so it's easier to see everything in the scene
+    scene.clearColor = BABYLON.Color3.Teal();       // Set the scene's background color
+
+    // --- --- --- Put your code here -- -- -- 
+    var scores, room;
+
+    // The colors we are using for good and bad scores
+    var goodScoreColor  = new BABYLON.StandardMaterial("Good Score Color", scene);
+    goodScoreColor.diffuseColor =  new BABYLON.Color3.Purple();
+    var badScoreColor  = new BABYLON.StandardMaterial("Good Score Color", scene);
+    badScoreColor.diffuseColor =  new BABYLON.Color3.Red();
+
+    console.log(goodScoreColor);
+
+
+    // The data: the score for each goal and also where it should be positioned on the screen
+    var roomScores = [
+        { number: 201, score: 4},
+        { number: 202, score: 2},
+        { number: 203, score: 1},
+        { number: 204, score: 4},
+        { number: 205, score: 3},
+        { number: 206, score: 1},
+        { number: 207, score: 2},
+        { number: 208, score: 4},
+        { number: 209, score: 2},
+        { number: 210, score: 4},
+        { number: 301, score: 3},
+        { number: 302, score: 4},
+        { number: 303, score: 1},
+        { number: 304, score: 2},
+        { number: 305, score: 2},
+        { number: 306, score: 1},
+        { number: 307, score: 1},
+        { number: 308, score: 3},
+        { number: 309, score: 1},
+        { number: 310, score: 2},
+        { number: 601, score: 4},
+        { number: 602, score: 3},
+        { number: 603, score: 1},
+        { number: 604, score: 4},
+        { number: 605, score: 3},
+        { number: 606, score: 4},
+        { number: 607, score: 3},
+        { number: 608, score: 4},
+        { number: 609, score: 1},
+        { number: 610, score: 4}
+    ];
+
+    // Loop through the roomScores, creating a sphere for each goal
+    for (let i = 0; i < roomScores.length; i++) {
+        var room = roomScores[i];
+
+        // Create a box for each room, and use a little math to position it on a grid
+        var floor = Math.trunc(room.number / 100);
+        var tier = room.number - floor * 100;
+        var box = BABYLON.Mesh.CreateBox('Room ' + room.number, 5, scene);
+        box.position = new BABYLON.Vector3(tier * 6 - 30, -30 +  (floor * 7), 0);
+
+        var roomMaterial  = new BABYLON.StandardMaterial("Room Material " + room.number, scene);
+        // If any goal has a score > 2, give it's sphere the good score color; otherwise give it the bad score color
+        if (room.score > 2)  {
+            roomMaterial.diffuseColor =  new BABYLON.Color3.Purple();
+        } else {
+            roomMaterial.diffuseColor =  new BABYLON.Color3.Red();
+        };
+        
+    //Create dynamic texture
+    var textureResolution = 512;
+	var textureGround = new BABYLON.DynamicTexture("dynamic texture", {width:512, height:256}, scene);   
+	var textureContext = textureGround.getContext();
+	
+	// var materialGround = new BABYLON.StandardMaterial("Mat", scene);    				
+	roomMaterial.diffuseTexture = textureGround;
+	
+    //Add text to dynamic texture
+    var font = "bold 90px monospace";
+    textureGround.drawText("Room " + room.number, 75, 135, font, "green", "white", true, true);
+
+    box.material = roomMaterial;        
+
+
+	        
+    };
+
+
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

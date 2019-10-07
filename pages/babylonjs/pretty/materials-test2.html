@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>        <!--- Link to the last version of BabylonJS --->
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>    <!-- Lets mobile devices manipulate the screen -->
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>      <!-- touch-action="none" for best results from PEP -->
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    var scene = new BABYLON.Scene(engine);
+     scene.clearColor = BABYLON.Color3.White();       // Set the scene's background color
+
+    var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 3 * Math.PI / 8, 5, BABYLON.Vector3.Zero(), scene);
+    camera.attachControl(canvas, true);
+	
+	
+	//Light direction is up and left
+	var light = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(-1, 1, 0), scene);
+	light.diffuse = BABYLON.Color3.White();       
+	// light.diffuse = new BABYLON.Color3(1, 0, 0);
+	// light.specular = new BABYLON.Color3(0, 1, 0);
+	// light.groundColor = new BABYLON.Color3(0, 1, 0);
+
+    // --- --- --- Put your code here -- -- -- 
+    var goal, sphere, sphereColor, goalMaterial;
+
+    // The colors we are using for good and bad scores
+	var badScoreColor  = "red";
+	var goodScoreColor = "purple";
+
+    // The data: the score for each goal and also where it should be positioned on the screen
+    // NOTE: If we do this for real, we will split the grid and the scores into separate variables
+    var goals = [
+        { name: 'Grow',         row: 1, column: 2, score: 3},
+        { name: 'Communicate',  row: 2, column: 1, score: 1},
+        { name: 'Sustain',      row: 2, column: 2, score: 3},
+        { name: 'Transform',    row: 2, column: 3, score: 2}
+    ];
+
+    // Loop through the goals, creating a sphere for each goal
+    for (goal = 0; goal < goals.length; goal++) {
+
+		var sphere = BABYLON.MeshBuilder.CreateSphere("Goal " + goal, {diameter: 1.25}, scene);
+		sphere.position.y = 2.5 - (goals[goal].row * 1.5) ;
+		sphere.position.x = goals[goal].column * 1.3 - 2.7  ;
+        sphere.rotation.x = Math.PI;
+        // sphere.rotation.y = 0.1;
+
+        material = new BABYLON.StandardMaterial("Goal " + goal, scene);
+        
+        if (goals[goal].score >1) {
+			sphereColor = badScoreColor;
+		} else {
+			sphereColor = goodScoreColor;
+		};
+
+        var textureGround = new BABYLON.DynamicTexture("dynamic texture", {width: 512, height: 256}, scene);   
+        material.diffuseTexture = textureGround;
+        var font = "bold 25px monospace";
+        textureGround.drawText(goals[goal].name, 355, 135, font, "white", sphereColor, true, true);
+
+        sphere.material = material;
+
+        console.log(goal, goals[goal].column, goals[goal].name);
+
+	};  
+	    
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

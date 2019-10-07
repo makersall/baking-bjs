@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Why Moore's Law Matters</title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>      <!-- Scripts for loading object files -->
+    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>   <!-- To use the Inspector when your project is stored and run locally with an internet connection then you need to load the Inspector directly -->
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+
+    <script src='../../libraries/simple-datachefs.js'></script>
+    <!-- <script src='../../libraries/papaparse.min.js'></script> -->
+
+  <script src="d3.v4.min.js"></script>         <!-- Load the d3 library -->
+
+    
+    <!-- <script src="https://d3js.org/d3-fetch.v1.min.js"></script> -->
+
+
+    
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas" touch-action="none"></canvas>         <!-- touch-action="none" for best results from PEP -->
+    <script src="myScript.js"></script>
+</body>
+</html>

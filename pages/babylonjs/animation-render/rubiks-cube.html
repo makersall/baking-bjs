@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>        <!--- Link to the last version of BabylonJS --->
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>    <!-- Lets mobile devices manipulate the screen -->
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>      <!-- touch-action="none" for best results from PEP -->
+
+<script>
+// From Trevor Baron: https://playground.babylonjs.com/#F7BSJ6#4
+
+
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    // This creates a basic Babylon Scene object (non-mesh)
+    var scene = new BABYLON.Scene(engine);
+
+    // This creates and positions a free camera (non-mesh)
+    var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(10, 10, 10), scene);
+
+    // This targets the camera to scene origin
+    camera.setTarget(BABYLON.Vector3.Zero());
+
+    // This attaches the camera to the canvas
+    camera.attachControl(canvas, true);
+
+    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+    //var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+    var light = new BABYLON.PointLight("light1", new BABYLON.Vector3(30, 50, 30), scene);
+
+    // Default intensity is 1. Let's dim the light a small amount
+    light.intensity = 1.3;
+
+    //scene.autoClear = false
+    scene.clearColor = BABYLON.Color3.FromHexString("#7f8c8d")
+
+    // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+    for(let i=0;i<2;i++){
+        for(let j=0;j<2;j++){
+            for(let k=0;k<2;k++){
+                let box = BABYLON.Mesh.CreateBox("sphere1", 2, scene);
+                box.position.x = i == 0 ? -1 : 1;
+                box.position.y = j == 0 ? -1 : 1;
+                box.position.z = k == 0 ? -1 : 1;
+
+                var matrial = new BABYLON.StandardMaterial("", scene)
+                if(i*4+j*2+k<1){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#2ecc71")
+                } else if(i*4+j*2+k<2){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#3498db")
+                }else if(i*4+j*2+k<3){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#9b59b6")
+                }else if(i*4+j*2+k<4){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#34495e")
+                }else if(i*4+j*2+k<5){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#f1c40f")
+                }else if(i*4+j*2+k<6){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#e67e22")
+                }else if(i*4+j*2+k<7){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#e74c3c")
+                }else if(i*4+j*2+k<8){
+                    matrial.diffuseColor = BABYLON.Color3.FromHexString("#ecf0f1")
+                }
+                box.material = matrial
+
+                let t = 0;
+                scene.onBeforeRenderObservable.add(()=>{
+                    t+=scene.getEngine().getDeltaTime();
+                    val = (1+Math.sin(t/500));
+                    box.position.set((i == 1 ? val : -val) + (i == 0 ? -1 : 1),(j == 1 ? val : -val) + (j == 0 ? -1 : 1),(k == 1 ? val : -val) + (k == 0 ? -1 : 1));
+                    box.scaling.set(1+val/2,1+val/2,1+val/2);
+                    box.rotation.set(0,(j == 1 ? val : -val)/1,0);
+                })
+            }
+        }
+    }
+    
+    // let t = 0;
+    // scene.onBeforeRenderObservable.add(()=>{
+    //     t+=scene.getEngine().getDeltaTime();
+    //     val = (1+Math.sin(t/500));
+    // })
+
+
+    // Put your code here
+	
+
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>

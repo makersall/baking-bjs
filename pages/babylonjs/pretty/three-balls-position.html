@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Test to make sure Position Works</title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            width   : 100%;
+            height  : 100%;
+            margin  : 0;
+            padding : 0;
+        }
+
+        #renderCanvas {
+            width   : 100%;
+            height  : 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas" touch-action="none"></canvas>     //touch-action="none" for best results from PEP
+    <script>
+        window.addEventListener('DOMContentLoaded', function(){
+            // get the canvas DOM element
+            var canvas = document.getElementById('renderCanvas');
+
+            // load the 3D engine
+            var engine = new BABYLON.Engine(canvas, true);
+
+
+
+var createScene = function () {
+
+    // NOTE: this is a quick and dirty test to figure out why position wasn't working.
+    // Looks like the problem wasn't position, it was that I was moving the sphere
+    // so far out that the camera didn't see it  :-) 
+
+    var scene = new BABYLON.Scene(engine);
+    var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 4, Math.PI / 2.5, 200, BABYLON.Vector3.Zero(), scene);
+    camera.attachControl(canvas, true);
+    camera.minZ = 0.1;
+    
+    // Environment Texture
+    var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("courtyard.dds", scene);
+
+    scene.imageProcessingConfiguration.exposure = 0.6;
+    scene.imageProcessingConfiguration.contrast = 1.6;
+
+    // Skybox
+    var hdrSkybox = BABYLON.Mesh.CreateBox("hdrSkyBox", 1000.0, scene);
+    var hdrSkyboxMaterial = new BABYLON.PBRMaterial("skyBox", scene);
+    hdrSkyboxMaterial.backFaceCulling = false;
+    hdrSkyboxMaterial.reflectionTexture = hdrTexture.clone();
+    hdrSkyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+	hdrSkyboxMaterial.microSurface = 1.0;
+    hdrSkyboxMaterial.disableLighting = true;
+    hdrSkybox.material = hdrSkyboxMaterial;
+    hdrSkybox.infiniteDistance = true;
+
+    // Create meshes
+    var sphereGlass = BABYLON.Mesh.CreateSphere("sphereGlass", 48, 30.0, scene);
+    sphereGlass.translate(new BABYLON.Vector3(1, 0, 0), -60);
+
+    var sphereMetal = BABYLON.Mesh.CreateSphere("sphereMetal", 48, 30.0, scene);
+    sphereMetal.translate(new BABYLON.Vector3(1, 0, 0), 60);
+
+	var spherePlastic = BABYLON.Mesh.CreateSphere("spherePlastic", 48, 30.0, scene);
+    // spherePlastic.translate(new BABYLON.Vector3(0, 0, 1), -60);
+    spherePlastic.position = new BABYLON.Vector3(0, 0, -60); 
+
+
+    var woodPlank = BABYLON.MeshBuilder.CreateBox("plane", { width: 65, height: 1, depth: 65 }, scene);
+
+    // Create materials
+    var glass = new BABYLON.PBRMaterial("glass", scene);
+    glass.reflectionTexture = hdrTexture;
+    glass.refractionTexture = hdrTexture;
+    glass.linkRefractionWithTransparency = true;
+    glass.indexOfRefraction = 0.52;
+    glass.alpha = 0;
+    glass.microSurface = 1;
+    glass.reflectivityColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new BABYLON.Color3(0.85, 0.85, 0.85);
+    sphereGlass.material = glass;
+
+    var metal = new BABYLON.PBRMaterial("metal", scene);
+    metal.reflectionTexture = hdrTexture;
+    metal.microSurface = 0.96;
+    metal.reflectivityColor = new BABYLON.Color3(0.85, 0.85, 0.85);
+    metal.albedoColor = new BABYLON.Color3(0.01, 0.01, 0.01);
+    sphereMetal.material = metal;
+	
+	var plastic = new BABYLON.PBRMaterial("plastic", scene);
+    plastic.reflectionTexture = hdrTexture;
+    plastic.microSurface = 0.96;
+	plastic.albedoColor = new BABYLON.Color3(0.206, 0.94, 1);
+	plastic.reflectivityColor = new BABYLON.Color3(0.003, 0.003, 0.003);
+    spherePlastic.material = plastic;
+
+    var wood = new BABYLON.PBRMaterial("wood", scene);
+    wood.reflectionTexture = hdrTexture;
+    wood.environmentIntensity = 1;
+    wood.specularIntensity = 0.3;
+
+    wood.reflectivityTexture = new BABYLON.Texture("textures/reflectivity.png", scene);
+    wood.useMicroSurfaceFromReflectivityMapAlpha = true;
+
+    wood.albedoColor = BABYLON.Color3.White();
+    wood.albedoTexture = new BABYLON.Texture("textures/albedo.png", scene);
+    woodPlank.material = wood;
+		
+    return scene;
+};
+
+
+
+
+
+            // call the createScene function
+            var scene = createScene();
+
+            // run the render loop
+            engine.runRenderLoop(function(){
+                scene.render();
+            });
+
+            // the canvas/window resize event handler
+            window.addEventListener('resize', function(){
+                engine.resize();
+            });
+        });
+    </script>
+</body>
+</html>

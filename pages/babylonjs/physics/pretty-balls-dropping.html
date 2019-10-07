@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Template Title</title>
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <script src="https://cdn.babylonjs.com/Oimo.js"></script>
+
+    
+    <style>
+        html, body { overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none;  }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas" touch-action="none"></canvas>     // touch-action="none" for best results from PEP
+
+<script>
+// Get set up
+var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+var createScene = function () {
+    // Set up a basic scene, including a camera and lighting
+    var scene = new BABYLON.Scene(engine);
+
+    // Original version: https://www.babylonjs-playground.com/#7149G4#0
+	
+    scene.clearColor = BABYLON.Color3.Purple();
+
+    var camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 0, -20), scene);
+    camera.attachControl(canvas, true);
+    camera.checkCollisions = true;
+    camera.applyGravity = true;
+    camera.setTarget(new BABYLON.Vector3(0, 0, 0));
+
+    var light = new BABYLON.DirectionalLight("dir02", new BABYLON.Vector3(0.2, -1, 0), scene);
+    light.position = new BABYLON.Vector3(0, 80, 0);
+
+    // Material
+    var materialAmiga = new BABYLON.StandardMaterial("amiga", scene);
+    materialAmiga.diffuseTexture = new BABYLON.Texture("../assets/bjs-amiga.jpg", scene);
+    materialAmiga.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    materialAmiga.diffuseTexture.uScale = 5;
+    materialAmiga.diffuseTexture.vScale = 5;
+
+    // Shadows
+    var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
+    
+    // // Physics
+    // //scene.enablePhysics(null, new BABYLON.CannonJSPlugin());
+    // scene.enablePhysics(null, new BABYLON.OimoJSPlugin());
+    scene.enablePhysics(new BABYLON.Vector3(0,-39.81, 0), new BABYLON.OimoJSPlugin());
+    // Spheres
+    var y = 0;
+    for (var index = 0; index < 100; index++) {
+        var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 1}, scene);
+        sphere.material = materialAmiga;
+        sphere.position = new BABYLON.Vector3(Math.random() * 20 - 10, y, Math.random() * 10 - 5);
+        // shadowGenerator.addShadowCaster(sphere);
+        sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
+        y += 2;
+    }
+
+    // ground
+    var ground = BABYLON.Mesh.CreateBox("Ground", 1, scene);
+    ground.scaling = new BABYLON.Vector3(100, 1, 100);
+    ground.position.y = -5.0;
+    ground.checkCollisions = true;
+    var groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+    groundMat.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    groundMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+    groundMat.backFaceCulling = false;
+    ground.material = groundMat;
+    ground.receiveShadows = true;
+
+    // Physics
+     ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5, restitution: 0.7 }, scene);
+
+    return scene;
+
+};
+
+// "Render" the scene so we can see it
+var scene = createScene();
+engine.runRenderLoop( function(){ scene.render(); } );
+window.addEventListener('resize', function(){ engine.resize(); } );     // If the user resizes the browser, update the screen
+
+</script>
+</body>
+</html>
